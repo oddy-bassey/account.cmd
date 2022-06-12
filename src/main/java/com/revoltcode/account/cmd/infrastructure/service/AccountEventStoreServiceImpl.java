@@ -6,6 +6,7 @@ import com.revoltcode.cqrs.core.event.BaseEvent;
 import com.revoltcode.cqrs.core.event.EventModel;
 import com.revoltcode.cqrs.core.exception.AggregateNotFoundException;
 import com.revoltcode.cqrs.core.exception.ConcurrencyException;
+import com.revoltcode.cqrs.core.exception.EventStreamNotFoundException;
 import com.revoltcode.cqrs.core.infrastructure.service.EventStoreService;
 import com.revoltcode.cqrs.core.infrastructure.producer.EventProducer;
 import lombok.RequiredArgsConstructor;
@@ -66,7 +67,7 @@ public class AccountEventStoreServiceImpl implements EventStoreService {
     @Override
     public List<String> getAggregateIds() {
         var eventStream = eventStoreRepository.findAll();
-        if(eventStream.isEmpty()) throw new IllegalStateException("Could not receive event stream from event store!");
+        if(eventStream.isEmpty()) throw new EventStreamNotFoundException("Could not retrieve the event stream from event store!");
         return eventStream.stream().map(EventModel::getAggregateIdentifier).distinct().collect(Collectors.toList());
     }
 }
