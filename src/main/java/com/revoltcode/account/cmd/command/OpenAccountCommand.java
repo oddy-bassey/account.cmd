@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class OpenAccountCommand extends BaseCommand {
 
-    private String accountHolder;
+    private String customerId;
     private AccountType accountType;
     private double openingBalance;
 }
