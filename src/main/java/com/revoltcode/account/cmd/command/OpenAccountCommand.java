@@ -9,5 +9,5 @@ public class OpenAccountCommand extends BaseCommand {
 
     private String customerId;
     private AccountType accountType;
-    private double openingBalance;
+    private double initialCredit;
 }

@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.MessageFormat;
 import java.util.UUID;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Slf4j
@@ -26,7 +25,6 @@ import java.util.logging.Logger;
 @RequestMapping("/api/v1/accounts")
 public class AccountController {
 
-    private final Logger logger = Logger.getLogger((AccountController.class.getName()));
     @Autowired
     private final CommandDispatcher commandDispatcher;
 
@@ -34,66 +32,34 @@ public class AccountController {
     public ResponseEntity<BaseResponse> openAccount(@RequestBody OpenAccountCommand command){
         var id = UUID.randomUUID().toString();
         command.setId(id);
-        try{
-            commandDispatcher.send(command);
-            return new ResponseEntity<>(new OpenAccountResponse("Bank account created successfully!", id), HttpStatus.OK);
-        }catch (IllegalStateException e){
-            logger.log(Level.WARNING, MessageFormat.format("Client made a bad request - {0}.", e.toString()));
-            return new ResponseEntity<>(new BaseResponse(e.toString()), HttpStatus.BAD_REQUEST);
-        }catch (Exception e){
-            var safeErrorMessage = MessageFormat.format("Error occurred while processing request to open a new bank account for id - {0}.", id);
-            logger.log(Level.SEVERE, safeErrorMessage, e);
-            return new ResponseEntity<>(new OpenAccountResponse(safeErrorMessage, id), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
+        commandDispatcher.send(command);
+        return new ResponseEntity<>(new OpenAccountResponse("Bank account created successfully!", id), HttpStatus.OK);
     }
 
     @PutMapping("/depositFunds/{id}")
     public ResponseEntity<BaseResponse> depositFunds(@PathVariable(value = "id") String id,
                                                    @RequestBody DepositFundsCommand command){
-        try{
-            command.setId(id);
-            commandDispatcher.send(command);
-            return new ResponseEntity<>(new BaseResponse("Funds deposit request completed successfully!"), HttpStatus.OK);
-        }catch(IllegalStateException | AggregateNotFoundException e){
-            logger.log(Level.WARNING, MessageFormat.format("Client made a bad request - {0}.", e.toString()));
-            return new ResponseEntity<>(new BaseResponse(e.toString()), HttpStatus.BAD_REQUEST);
-        }catch (Exception e){
-            var safeErrorMessage = MessageFormat.format("Error occurred while processing request to deposit funds from bank account with id - {0}.", id);
-            logger.log(Level.SEVERE, safeErrorMessage, e);
-            return new ResponseEntity<>(new OpenAccountResponse(safeErrorMessage, id), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        command.setId(id);
+        commandDispatcher.send(command);
+        return new ResponseEntity<>(new BaseResponse(MessageFormat.format("Funds deposit of {0} amount completed successfully on account with id {1}!",
+                command.getAmount(), id)), HttpStatus.OK);
     }
 
     @PutMapping("/withdrawFunds/{id}")
     public ResponseEntity<BaseResponse> withdrawFunds(@PathVariable(value = "id") String id,
                                                      @RequestBody WithdrawFundsCommand command){
-        try{
-            command.setId(id);
-            commandDispatcher.send(command);
-            return new ResponseEntity<>(new BaseResponse("Funds withdrawal request completed successfully!"), HttpStatus.OK);
-        }catch(IllegalStateException | AggregateNotFoundException e){
-            logger.log(Level.WARNING, MessageFormat.format("Client made a bad request - {0}.", e.toString()));
-            return new ResponseEntity<>(new BaseResponse(e.toString()), HttpStatus.BAD_REQUEST);
-        }catch (Exception e){
-            var safeErrorMessage = MessageFormat.format("Error occurred while processing request to withdraw funds from bank account with id - {0}.", id);
-            logger.log(Level.SEVERE, safeErrorMessage, e);
-            return new ResponseEntity<>(new OpenAccountResponse(safeErrorMessage, id), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        command.setId(id);
+        commandDispatcher.send(command);
+        return new ResponseEntity<>(new BaseResponse(MessageFormat.format("Funds withdrawal of {0} amount completed successfully on account with id {1}!",
+                command.getAmount(), id)), HttpStatus.OK);
     }
 
     @DeleteMapping("/closeAccount/{id}")
     public ResponseEntity<BaseResponse> closeAccount(@PathVariable(value = "id") String id){
-        try{
-            commandDispatcher.send(new CloseAccountCommand(id));
-            return new ResponseEntity<>(new BaseResponse("Bank account closure request successfully completed!"), HttpStatus.CREATED);
-        }catch(IllegalStateException | AggregateNotFoundException e){
-            logger.log(Level.WARNING, MessageFormat.format("Client made a bad request - {0}.", e.toString()));
-            return new ResponseEntity<>(new BaseResponse(e.toString()), HttpStatus.BAD_REQUEST);
-        }catch (Exception e){
-            var safeErrorMessage = MessageFormat.format("Error occurred while processing request to close bank account with id - {0}.", id);
-            logger.log(Level.SEVERE, safeErrorMessage, e);
-            return new ResponseEntity<>(new OpenAccountResponse(safeErrorMessage, id), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
+        commandDispatcher.send(new CloseAccountCommand(id));
+        return new ResponseEntity<>(new BaseResponse(MessageFormat.format("Bank account with id: {0} closed successfully!", id)), HttpStatus.CREATED);
     }
 }
 

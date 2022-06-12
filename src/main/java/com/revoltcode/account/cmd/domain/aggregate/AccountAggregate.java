@@ -27,7 +27,7 @@ public class AccountAggregate extends AggregateRoot {
                 .id(command.getId())
                 .customerId(command.getCustomerId())
                 .accountType(command.getAccountType())
-                .openingBalance(command.getOpeningBalance())
+                .openingBalance(command.getInitialCredit())
                 .build());
     }
 
