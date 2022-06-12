@@ -1,4 +1,4 @@
-package com.revoltcode.account.cmd.infrastructure.handler;
+package com.revoltcode.account.cmd.infrastructure.dispatcher;
 
 import com.revoltcode.cqrs.core.command.BaseCommand;
 import com.revoltcode.cqrs.core.infrastructure.dispatcher.CommandDispatcher;
