@@ -6,6 +6,7 @@ import com.revoltcode.account.common.exception.NegativeDepositAmountException;
 import com.revoltcode.cqrs.core.exception.AggregateNotFoundException;
 import com.revoltcode.cqrs.core.exception.ConcurrencyException;
 import com.revoltcode.cqrs.core.exception.EventStreamNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,6 +17,7 @@ import org.springframework.web.context.request.WebRequest;
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 
+@Slf4j
 @RestControllerAdvice
 public class AccountControllerExceptionHandler {
 
@@ -107,6 +109,7 @@ public class AccountControllerExceptionHandler {
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorMessage accessDeniedException(Exception ex, WebRequest request) {
 
+        log.error(ex.toString());
         return ErrorMessage.builder()
                 .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .timestamp(LocalDateTime.now())

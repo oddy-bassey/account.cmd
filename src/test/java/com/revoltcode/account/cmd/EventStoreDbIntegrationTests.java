@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.time.LocalDate;
 import java.util.Date;
 
-@TestPropertySource("/application.properties")
+@TestPropertySource("/application.yml")
 @SpringBootTest
 class EventStoreDbIntegrationTests {
 
