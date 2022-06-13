@@ -10,10 +10,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.TestPropertySource;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestPropertySource("/application.yml")
 @SpringBootTest
@@ -59,7 +59,7 @@ class EventStoreDbIntegrationTests {
 		var event = AccountOpenedEvent.builder()
 				.customerId("68660651-ef7c-412e-aa4d-92995c99754c")
 				.accountType(AccountType.CURRENT)
-				.createdDate(LocalDate.now())
+				.createdDate(LocalDateTime.now())
 				.openingBalance(600)
 				.build();
 

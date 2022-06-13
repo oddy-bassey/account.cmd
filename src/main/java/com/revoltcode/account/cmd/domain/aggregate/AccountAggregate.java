@@ -8,6 +8,8 @@ import com.revoltcode.account.common.event.FundsWithdrawnEvent;
 import com.revoltcode.cqrs.core.domain.aggregate.AggregateRoot;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @NoArgsConstructor
 public class AccountAggregate extends AggregateRoot {
 
@@ -28,6 +30,7 @@ public class AccountAggregate extends AggregateRoot {
                 .customerId(command.getCustomerId())
                 .accountType(command.getAccountType())
                 .openingBalance(command.getInitialCredit())
+                .createdDate(LocalDateTime.now())
                 .build());
     }
 
