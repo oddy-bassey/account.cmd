@@ -95,7 +95,7 @@ public class AccountControllerExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(value = HttpStatus.FORBIDDEN)
-    public ErrorMessage accessDeniedException(AccessDeniedException ex, WebRequest request) {
+    public ErrorMessage generalException(AccessDeniedException ex, WebRequest request) {
 
         return ErrorMessage.builder()
                 .statusCode(HttpStatus.FORBIDDEN.value())
