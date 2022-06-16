@@ -2,7 +2,7 @@ package com.revoltcode.account.cmd;
 
 import com.revoltcode.account.cmd.domain.aggregate.AccountAggregate;
 import com.revoltcode.account.common.dto.AccountType;
-import com.revoltcode.account.common.event.AccountOpenedEvent;
+import com.revoltcode.account.common.event.account.AccountOpenedEvent;
 import com.revoltcode.cqrs.core.event.EventModel;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

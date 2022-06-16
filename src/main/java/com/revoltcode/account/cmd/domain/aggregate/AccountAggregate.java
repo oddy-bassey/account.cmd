@@ -1,10 +1,7 @@
 package com.revoltcode.account.cmd.domain.aggregate;
 
 import com.revoltcode.account.cmd.command.OpenAccountCommand;
-import com.revoltcode.account.common.event.AccountClosedEvent;
-import com.revoltcode.account.common.event.AccountOpenedEvent;
-import com.revoltcode.account.common.event.FundsDepositedEvent;
-import com.revoltcode.account.common.event.FundsWithdrawnEvent;
+import com.revoltcode.account.common.event.account.*;
 import com.revoltcode.cqrs.core.domain.aggregate.AggregateRoot;
 import lombok.NoArgsConstructor;
 
@@ -24,10 +21,11 @@ public class AccountAggregate extends AggregateRoot {
         return this.balance;
     }
 
-    public AccountAggregate(OpenAccountCommand command){
+    public AccountAggregate(OpenAccountCommand command, String accountName){
         raiseEvent(AccountOpenedEvent.builder()
                 .id(command.getId())
                 .customerId(command.getCustomerId())
+                .name(accountName)
                 .accountType(command.getAccountType())
                 .openingBalance(command.getInitialCredit())
                 .createdDate(LocalDateTime.now())
@@ -65,6 +63,21 @@ public class AccountAggregate extends AggregateRoot {
     }
 
     public void apply(FundsWithdrawnEvent event){
+        this.id = event.getId();
+        this.balance -= event.getAmount();
+    }
+
+    public void transferFunds(double amount, String creditAccountId){
+        if(!this.active) throw new IllegalStateException("Funds cannot be transferred from a closed account!");
+
+        raiseEvent(FundsTransferedEvent.builder()
+                .id(this.id)
+                .amount(amount)
+                .creditAccountId(creditAccountId)
+                .build());
+    }
+
+    public void apply(FundsTransferedEvent event){
         this.id = event.getId();
         this.balance -= event.getAmount();
     }

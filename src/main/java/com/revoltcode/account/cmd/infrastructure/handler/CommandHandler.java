@@ -4,9 +4,10 @@ import com.revoltcode.account.cmd.command.*;
 
 public interface CommandHandler {
 
-    public void handle(OpenAccountCommand command);
-    public void handle(DepositFundsCommand command);
-    public void handle(WithdrawFundsCommand command);
-    public void handle(CloseAccountCommand command);
-    public void handle(RestoreReadDbCommand command);
+    void handle(OpenAccountCommand command);
+    void handle(DepositFundsCommand command);
+    void handle(WithdrawFundsCommand command);
+    void handle(TransferFundsCommand command);
+    void handle(CloseAccountCommand command);
+    void handle(RestoreReadDbCommand command);
 }

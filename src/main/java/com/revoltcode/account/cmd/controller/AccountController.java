@@ -1,9 +1,6 @@
 package com.revoltcode.account.cmd.controller;
 
-import com.revoltcode.account.cmd.command.DepositFundsCommand;
-import com.revoltcode.account.cmd.command.OpenAccountCommand;
-import com.revoltcode.account.cmd.command.WithdrawFundsCommand;
-import com.revoltcode.account.cmd.command.CloseAccountCommand;
+import com.revoltcode.account.cmd.command.*;
 import com.revoltcode.account.cmd.dto.OpenAccountResponse;
 import com.revoltcode.account.common.dto.BaseResponse;
 import com.revoltcode.cqrs.core.exception.AggregateNotFoundException;
@@ -53,6 +50,17 @@ public class AccountController {
         commandDispatcher.send(command);
         return new ResponseEntity<>(new BaseResponse(MessageFormat.format("Funds withdrawal of {0} amount completed successfully on account with id {1}!",
                 command.getAmount(), id)), HttpStatus.OK);
+    }
+
+    @PutMapping("/transferFunds/{debitAccountId}/{creditAccountId}")
+    public ResponseEntity<BaseResponse> transferFunds(@PathVariable(value = "debitAccountId") String debitAccountId,
+                                                      @PathVariable(value = "creditAccountId") String creditAccountId,
+                                                      @RequestBody TransferFundsCommand command){
+        command.setId(debitAccountId);
+        command.setCreditAccountId(creditAccountId);
+        commandDispatcher.send(command);
+        return new ResponseEntity<>(new BaseResponse(MessageFormat.format("Funds transfer of {0} amount from account with id {1} to account with id: {2} completed successfully!",
+                command.getAmount(), debitAccountId, creditAccountId)), HttpStatus.OK);
     }
 
     @DeleteMapping("/closeAccount/{id}")

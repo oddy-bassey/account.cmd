@@ -1,6 +1,8 @@
 package com.revoltcode.account.cmd.controller.advice;
 
 import com.revoltcode.account.common.dto.ErrorMessage;
+import com.revoltcode.account.common.exception.AccountNotFoundException;
+import com.revoltcode.account.common.exception.FraudulentTransactionException;
 import com.revoltcode.account.common.exception.InsufficientFundsException;
 import com.revoltcode.account.common.exception.NegativeDepositAmountException;
 import com.revoltcode.cqrs.core.exception.AggregateNotFoundException;
@@ -20,6 +22,30 @@ import java.time.LocalDateTime;
 @Slf4j
 @RestControllerAdvice
 public class AccountControllerExceptionHandler {
+
+    @ExceptionHandler(AccountNotFoundException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ErrorMessage accountNotFoundException(AccountNotFoundException ex, WebRequest request) {
+
+        return ErrorMessage.builder()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .timestamp(LocalDateTime.now())
+                .message(ex.getMessage())
+                .description(request.getDescription(false))
+                .build();
+    }
+
+    @ExceptionHandler(FraudulentTransactionException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ErrorMessage fraudulentTransactionException(FraudulentTransactionException ex, WebRequest request) {
+
+        return ErrorMessage.builder()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .timestamp(LocalDateTime.now())
+                .message(ex.getMessage())
+                .description(request.getDescription(false))
+                .build();
+    }
 
     @ExceptionHandler(NegativeDepositAmountException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
