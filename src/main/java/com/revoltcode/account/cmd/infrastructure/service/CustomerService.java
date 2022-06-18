@@ -1,5 +1,6 @@
 package com.revoltcode.account.cmd.infrastructure.service;
 
+import com.revoltcode.account.common.dto.rest.Customer;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,5 +10,5 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface CustomerService {
 
     @GetMapping("/{customerId}")
-    ResponseEntity<?> getCustomer(@PathVariable("customerId") String customerId);
+    ResponseEntity<Customer> getCustomer(@PathVariable("customerId") String customerId);
 }

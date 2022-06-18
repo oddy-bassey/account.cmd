@@ -1,16 +1,16 @@
 package com.revoltcode.account.cmd.infrastructure.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revoltcode.account.cmd.command.*;
 import com.revoltcode.account.cmd.domain.aggregate.AccountAggregate;
 import com.revoltcode.account.cmd.infrastructure.service.AccountService;
 import com.revoltcode.account.cmd.infrastructure.service.CustomerService;
+import com.revoltcode.account.common.dto.rest.Customer;
+import com.revoltcode.account.common.exception.AccountExistsException;
 import com.revoltcode.account.common.exception.FraudulentTransactionException;
 import com.revoltcode.account.common.exception.InsufficientFundsException;
 import com.revoltcode.account.common.exception.NegativeDepositAmountException;
-import com.revoltcode.cqrs.core.domain.model.BaseEntity;
 import com.revoltcode.cqrs.core.infrastructure.handler.EventSourcingHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -33,19 +34,23 @@ public class AccountCommandHandler implements CommandHandler{
     @Override
     public void handle(OpenAccountCommand command) {
         if(command.getInitialCredit()<0) throw new NegativeDepositAmountException("The initial credit amount cannot be less than 0.00!");
+
         // ToDO: verify customer exists!
-        ResponseEntity<?> customerResponse = customerService.getCustomer(command.getCustomerId());
+        StringBuffer accountName = new StringBuffer();
+        ResponseEntity<Customer> customerResponse = customerService.getCustomer(command.getCustomerId());
+        Customer customer = customerResponse.getBody();
+        accountName.append(customer.getLastName()).append(" ").append(customer.getFirstName());
 
         // ToDO: verify if customer has an account of account type!
         ResponseEntity<?> accountResponse = accountService.getAccountByCustomerAndAccountType(command.getCustomerId(), command.getAccountType());
 
-//        if(response.getStatusCode().is2xxSuccessful())  throw new AccountExistsException(
-//                MessageFormat.format("Unable to create account for customer ({0}) with id: {1}, " +
-//                        "who already has an existing {2} account with account id: {3}",
-//                        accountName, command.getId(), command.getAccountType(), account.get().getId()));
+        if(accountResponse.getStatusCode().value() == 200 && Optional.ofNullable(accountResponse.getBody()).isPresent())  throw new AccountExistsException(
+                MessageFormat.format("Unable to create account for customer ({0}) with id: {1}, " +
+                        "who already has an existing {2} account with Zubank!",
+                        accountName, command.getId(), command.getAccountType()));
 
 
-        var aggregate = new AccountAggregate(command, "accountName");
+        var aggregate = new AccountAggregate(command, accountName.toString());
         eventSourcingHandler.save(aggregate);
     }
 
