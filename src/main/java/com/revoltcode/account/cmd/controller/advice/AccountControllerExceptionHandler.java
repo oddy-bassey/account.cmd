@@ -121,7 +121,7 @@ public class AccountControllerExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(value = HttpStatus.FORBIDDEN)
-    public ErrorMessage generalException(AccessDeniedException ex, WebRequest request) {
+    public ErrorMessage accessDeniedException(AccessDeniedException ex, WebRequest request) {
 
         return ErrorMessage.builder()
                 .statusCode(HttpStatus.FORBIDDEN.value())
@@ -133,7 +133,7 @@ public class AccountControllerExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorMessage accessDeniedException(Exception ex, WebRequest request) {
+    public ErrorMessage generalException(Exception ex, WebRequest request) {
 
         log.error(ex.toString());
         return ErrorMessage.builder()
