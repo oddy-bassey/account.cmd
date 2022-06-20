@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -30,8 +31,15 @@ public class AccountController {
         var id = UUID.randomUUID().toString();
         command.setId(id);
 
+        final BigDecimal initialCredit = command.getInitialCredit();
         commandDispatcher.send(command);
-        return new ResponseEntity<>(new OpenAccountResponse("Bank account created successfully!", id), HttpStatus.OK);
+
+        String extraMsg = "";
+        if(initialCredit.compareTo(BigDecimal.ZERO) > 0) {
+            extraMsg = " A deposit of "+initialCredit+" amount successfully posted to account.";
+        }
+        return new ResponseEntity<>(new OpenAccountResponse("Bank account created successfully!"
+                +extraMsg, id), HttpStatus.OK);
     }
 
     @PutMapping("/depositFunds/{id}")

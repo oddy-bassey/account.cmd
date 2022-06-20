@@ -1,6 +1,5 @@
 package com.revoltcode.account.cmd.infrastructure.handler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revoltcode.account.cmd.command.*;
 import com.revoltcode.account.cmd.domain.aggregate.AccountAggregate;
@@ -17,8 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.text.MessageFormat;
-import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -33,7 +32,7 @@ public class AccountCommandHandler implements CommandHandler{
 
     @Override
     public void handle(OpenAccountCommand command) {
-        if(command.getInitialCredit()<0) throw new NegativeDepositAmountException("The initial credit amount cannot be less than 0.00!");
+        if(command.getInitialCredit().compareTo(BigDecimal.ZERO)<0) throw new NegativeDepositAmountException("The initial credit amount cannot be less than 0.00!");
 
         // ToDO: verify customer exists!
         StringBuffer accountName = new StringBuffer();
@@ -49,9 +48,21 @@ public class AccountCommandHandler implements CommandHandler{
                         "who already has an existing {2} account with Zubank!",
                         accountName, command.getId(), command.getAccountType()));
 
+        /* ToDO: Execute a transaction if initialAmount is not 0
+         * set initial account balance to zero & and make a deposit to account created if initialCredit > 0
+        */
+        final BigDecimal amountToDeposit = command.getInitialCredit();
+        command.setInitialCredit(BigDecimal.ZERO);
 
         var aggregate = new AccountAggregate(command, accountName.toString());
         eventSourcingHandler.save(aggregate);
+
+        if(amountToDeposit.compareTo(BigDecimal.ZERO) > 0){
+            DepositFundsCommand depositCommand = new DepositFundsCommand();
+            depositCommand.setId(command.getId());
+            depositCommand.setAmount(amountToDeposit);
+            handle(depositCommand);
+        }
     }
 
     @Override
@@ -64,7 +75,7 @@ public class AccountCommandHandler implements CommandHandler{
     @Override
     public void handle(WithdrawFundsCommand command) {
         var aggregate = eventSourcingHandler.getById(command.getId());
-        if(command.getAmount() > aggregate.getBalance()){
+        if(command.getAmount().compareTo(aggregate.getBalance()) > 0){
             throw new InsufficientFundsException("Withdrawal declined, insufficient funds!");
         }
         aggregate.withdrawFunds(command.getAmount());
@@ -79,7 +90,7 @@ public class AccountCommandHandler implements CommandHandler{
             throw new FraudulentTransactionException(
                     MessageFormat.format("Account with id: {0} cannot make a transfer of funds to itself!", command.getId()));
         }
-        if(command.getAmount() > aggregate.getBalance()){
+        if(command.getAmount().compareTo(aggregate.getBalance()) > 0){
             throw new InsufficientFundsException("Transfer declined, insufficient funds!");
         }
         aggregate.transferFunds(command.getAmount(), command.getCreditAccountId());

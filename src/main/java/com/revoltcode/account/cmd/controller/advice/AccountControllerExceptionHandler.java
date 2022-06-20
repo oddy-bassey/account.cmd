@@ -135,7 +135,7 @@ public class AccountControllerExceptionHandler {
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorMessage generalException(Exception ex, WebRequest request) {
 
-        log.error(ex.toString());
+        ex.printStackTrace();
         return ErrorMessage.builder()
                 .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .timestamp(LocalDateTime.now())

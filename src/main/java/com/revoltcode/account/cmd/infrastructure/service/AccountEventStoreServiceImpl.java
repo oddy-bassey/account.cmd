@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,7 +40,7 @@ public class AccountEventStoreServiceImpl implements EventStoreService {
             version++;
             event.setVersion(version);
             var eventModel = EventModel.builder()
-                    .timestamp(new Date())
+                    .createdDate(LocalDateTime.now())
                     .aggregateIdentifier(aggregateId)
                     .aggregateType(AccountAggregate.class.getTypeName())
                     .version(version)

@@ -5,19 +5,20 @@ import com.revoltcode.account.common.event.account.*;
 import com.revoltcode.cqrs.core.domain.aggregate.AggregateRoot;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
 public class AccountAggregate extends AggregateRoot {
 
     private Boolean active;
-    private double balance;
+    private BigDecimal balance;
 
     public Boolean getActive() {
         return active;
     }
 
-    public double getBalance(){
+    public BigDecimal getBalance(){
         return this.balance;
     }
 
@@ -38,9 +39,9 @@ public class AccountAggregate extends AggregateRoot {
         this.balance = event.getOpeningBalance();
     }
 
-    public void depositFunds(double amount){
+    public void depositFunds(BigDecimal amount){
         if(!this.active) throw new IllegalStateException("Funds cannot be deposited into a closed account!");
-        if(amount <= 0) throw new IllegalStateException("The deposit amount must be greater than 0.00!");
+        if(amount.compareTo(BigDecimal.ZERO) <= 0) throw new IllegalStateException("The deposit amount must be greater than 0.00!");
 
         raiseEvent(FundsDepositedEvent.builder()
                 .id(this.id)
@@ -50,10 +51,10 @@ public class AccountAggregate extends AggregateRoot {
 
     public void apply(FundsDepositedEvent event){
         this.id = event.getId();
-        this.balance += event.getAmount();
+        this.balance = getBalance().add(event.getAmount());
     }
 
-    public void withdrawFunds(double amount){
+    public void withdrawFunds(BigDecimal amount){
         if(!this.active) throw new IllegalStateException("Funds cannot be withdrawn from a closed account!");
 
         raiseEvent(FundsWithdrawnEvent.builder()
@@ -64,10 +65,10 @@ public class AccountAggregate extends AggregateRoot {
 
     public void apply(FundsWithdrawnEvent event){
         this.id = event.getId();
-        this.balance -= event.getAmount();
+        this.balance = getBalance().subtract(event.getAmount());
     }
 
-    public void transferFunds(double amount, String creditAccountId){
+    public void transferFunds(BigDecimal amount, String creditAccountId){
         if(!this.active) throw new IllegalStateException("Funds cannot be transferred from a closed account!");
 
         raiseEvent(FundsTransferedEvent.builder()
@@ -79,7 +80,7 @@ public class AccountAggregate extends AggregateRoot {
 
     public void apply(FundsTransferedEvent event){
         this.id = event.getId();
-        this.balance -= event.getAmount();
+        this.balance = getBalance().subtract(event.getAmount());
     }
 
     public void closeAccount(){

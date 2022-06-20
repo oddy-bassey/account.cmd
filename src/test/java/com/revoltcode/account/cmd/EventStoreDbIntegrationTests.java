@@ -1,15 +1,24 @@
 package com.revoltcode.account.cmd;
 
+import com.mongodb.client.MongoClients;
 import com.revoltcode.account.cmd.domain.aggregate.AccountAggregate;
 import com.revoltcode.account.common.dto.AccountType;
 import com.revoltcode.account.common.event.account.AccountOpenedEvent;
 import com.revoltcode.cqrs.core.event.EventModel;
+import de.flapdoodle.embed.mongo.MongodExecutable;
+import de.flapdoodle.embed.mongo.MongodStarter;
+import de.flapdoodle.embed.mongo.config.ImmutableMongodConfig;
+import de.flapdoodle.embed.mongo.config.MongodConfig;
+import de.flapdoodle.embed.mongo.config.Net;
+import de.flapdoodle.embed.mongo.distribution.Version;
+import de.flapdoodle.embed.process.runtime.Network;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.TestPropertySource;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -24,11 +33,11 @@ class EventStoreDbIntegrationTests {
 
 	/* setup MongoDB configuration manually to particularly test specific versions
 	 * else spring automatically configures the DB
-
+	 */
 	@Autowired
 	private MongodExecutable mongodExecutable;
 
-	@BeforeEach
+	// @BeforeEach
 	void setup() throws Exception {
 		String connectionString = "mongodb://%s:%d";
 		String ip = "localhost";
@@ -45,11 +54,11 @@ class EventStoreDbIntegrationTests {
 		mongoTemplate = new MongoTemplate(MongoClients.create(String.format(connectionString, ip, port)), "zubankAccount");
 	}
 
-	@AfterEach
+	// @AfterEach
 	void clean() {
 		mongodExecutable.stop();
 	}
-	*/
+
 
 
 	@Test
@@ -60,11 +69,11 @@ class EventStoreDbIntegrationTests {
 				.customerId("68660651-ef7c-412e-aa4d-92995c99754c")
 				.accountType(AccountType.CURRENT)
 				.createdDate(LocalDateTime.now())
-				.openingBalance(600)
+				.openingBalance(BigDecimal.valueOf(600))
 				.build();
 
 		var eventModel = EventModel.builder()
-				.timestamp(new Date())
+				.createdDate(LocalDateTime.now())
 				.aggregateIdentifier("68660651-ef7c-412e-aa4d-92995c99721b")
 				.aggregateType(AccountAggregate.class.getTypeName())
 				.version(0)
