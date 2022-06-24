@@ -12,7 +12,7 @@ below are the technologies used in developing the application
 * JPA
 * MongoDB (de.flapdoodle.embed.mongo in-memory database)
 * Kafka
-* Junit5
+* Junit5 & Mockito
 
 Accessing Account Command APIs
 -
