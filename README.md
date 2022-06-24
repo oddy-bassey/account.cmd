@@ -32,13 +32,13 @@ Architecture
 -
 The account service as a whole is delivered through both the account.cmd and account.query service. This is because Domain 
 Driven Design pattern is used to define the problem within a bounded context (domain) as in this case. The account.cmd service therefore
-defining the command domain layer utilizes CQRS event-sourcing which DDD facilitates to implement a core part of the bank account service.
+defining the write/command domain layer utilizes CQRS & event-sourcing which DDD facilitates to implement a core part of the bank account service.
 Not to delve too much into the entire architecture for this, I'll be focusing on the command domain alone. The command layer features
 key important implementations which functions together to deliver an event driven process for the command module. These are:
 * Command dispatcher
 * Command Handler
 * Event sourcing handler
-* Event sore
+* Event store
 * Event producer <br>
 
 When a request (open new account, deposit funds, withdraw funds, delete account) is being made to the REST controller, 
@@ -54,3 +54,4 @@ Testing
 Testing is achieved using Junit5 & Mockito library. The application features simple test classes for: <br>
 * Database integration test
   ![alt text](https://github.com/oddy-bassey/account.cmd/blob/main/src/main/resources/screen_shots/acc_db_Itest.PNG?raw=true)
+...
